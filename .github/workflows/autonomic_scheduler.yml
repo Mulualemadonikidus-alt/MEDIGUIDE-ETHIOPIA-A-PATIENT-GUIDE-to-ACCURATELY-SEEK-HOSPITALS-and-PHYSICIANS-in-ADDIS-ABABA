@@ -1,51 +1,52 @@
-name: Autonomic Medical Directory Scheduler
+name: Autonomic Data Scheduler
 
 on:
   schedule:
-    - cron: '0 0 * * 0'      # Run every Sunday at midnight (Weekly Health Center Search)
-    - cron: '0 4 1,15 * *'   # Run on the 1st and 15th of each month (Bi-Weekly Personnel Audit)
-  workflow_dispatch:          # Allows manual trigger overrides via GitHub UI button
+    # This runs the action automatically at midnight every Sunday.
+    # You can adjust the cron syntax if you need it to run more or less frequently.
+    - cron: '0 0 * * 0'
+  workflow_dispatch: 
+    # This allows you to manually click a "Run workflow" button in the GitHub Actions tab.
 
 jobs:
-  run-research-agents:
-    runs-name: Triggering Autonomous Extraction Engine
+  update-directory:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code files
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: true
+    permissions:
+      contents: write # Required so the bot can push the new data back to your main branch
 
-      - name: Initialize Python Core
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip' # Speeds up future runs by caching dependencies
 
-      - name: Setup System Dependencies
+      - name: Install dependencies
         run: |
-          pip install beautifulsoup4 requests google-genai
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Execute Weekly Healthcare Center Audit
-        if: github.event.schedule == '0 0 * * 0' || github.event_with == 'workflow_dispatch'
-        env:
-          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python research_hospitals.py
-
-      - name: Execute Bi-Weekly Medical Personnel Audit
-        if: github.event.schedule == '0 4 1,15 * *' || github.event_with == 'workflow_dispatch'
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python research_personnel.py
-
-      - name: Commit and Push Verified Schema Modifications
+      - name: Run data gathering scripts
         run: |
-          git config --global user.name "MediGuide Autonomic Bot"
-          git config --global user.email "bot@mediguide-ethiopia.org"
-          git add hospitals.json
+          python research_hospitals.py
+          python research_personnel.py
+
+      - name: Commit and Push changes
+        run: |
+          # Configure git to use the standard GitHub Actions bot identity
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Stage all changes (e.g., updates to hospitals.json.json or other data files)
+          git add -A
+          
+          # Check if there are actually any changes before trying to commit
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Autonomic Data Sync: Corrected Addis Ababa healthcare matrix profiles [skip ci]"
-            git push origin main
+            git commit -m "chore: automated directory data update"
+            git push
           else
-            print "Zero data delta variations discovered."
+            echo "No data changes detected. Skipping commit."
           fi
