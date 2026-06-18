@@ -115,3 +115,18 @@ def run_weekly_hospital_search():
 
 if __name__ == "__main__":
     run_weekly_hospital_search()
+import json
+import os
+
+# ... [YOUR EXISTING SCRAPING CODE GOES HERE] ...
+# Assume your scraping loop gathers all hospitals into a python list called `scraped_hospitals_list`
+
+# 1. Define the correct, unified database path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
+
+# 2. Save the complete list directly to the JSON file
+with open(DB_PATH, 'w', encoding='utf-8') as f:
+    json.dump(scraped_hospitals_list, f, indent=2, ensure_ascii=False)
+
+print("Scraping complete. Database updated successfully.")
