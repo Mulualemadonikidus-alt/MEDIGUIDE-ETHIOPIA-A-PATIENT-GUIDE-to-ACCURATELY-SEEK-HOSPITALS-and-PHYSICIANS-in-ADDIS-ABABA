@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="MediGuide Ethiopia — Comprehensive directory of specialized hospitals, medical centers, specialists and sub-specialists in Addis Ababa, Ethiopia. AI-powered symptom checker to find the right care."/>
+<meta name="keywords" content="hospitals Addis Ababa, Ethiopia doctors, specialized hospital Ethiopia, Tikur Anbessa, Addis Cardiac, medical directory Ethiopia"/>
+<meta property="og:title" content="MediGuide Ethiopia — Addis Ababa Medical Directory"/>
+<meta property="og:description" content="Find specialized hospitals, doctors and sub-specialists in Addis Ababa. AI symptom checker guides you to the right care."/>
+<meta property="og:type" content="website"/>
+<title>MediGuide Ethiopia — Addis Ababa Specialized Medical Directory</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚕</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a1628;color:#e8f0ff;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a6e;border-radius:3px}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fade{animation:fadeIn .35s ease}
+button{cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+textarea,input{font-family:'Inter',sans-serif}
+a{color:#3b82f6;text-decoration:none}a:hover{text-decoration:underline}
+.nav-btn{border:1px solid #1e3a6e;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:#8ea8d0}
+.nav-btn.active,.nav-btn:hover{background:#c8a951;color:#0a0800;border-color:#c8a951}
+.filter-btn{border:1px solid #1e3a6e;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:#0f2040;color:#8ea8d0}
+.filter-btn.active,.filter-btn:hover{background:#c8a951;color:#0a0800;border-color:#c8a951}
+.hosp-card{background:#122040;border:1px solid #1e3a6e;border-radius:12px;padding:18px 22px;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.hosp-card:hover,.hosp-card.open{background:#163060;border-color:#c8a951}
+.sub-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:13px 15px}
+.stat-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:14px 16px;text-align:center}
+.quick-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:13px 15px}
+.loc-card{background:#070f1e;border:1px solid #1e3a6e;border-radius:10px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start}
+.badge-pub{background:#1a3a1a;color:#22a65c;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.badge-priv{background:#1a2a3a;color:#3b82f6;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.badge-ngo{background:#2a1a3a;color:#c084fc;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.badge-gold{background:#1e2a0a;color:#c8a951;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+.spec-pill{display:inline-block;background:#0d1e3a;color:#8ea8d0;font-size:10px;padding:2px 7px;border-radius:10px;margin:2px 3px 2px 0;border:1px solid #1e3a6e}
+.sym-area{width:100%;min-height:95px;padding:13px 15px;border-radius:10px;border:1px solid #1e3a6e;background:#070f1e;color:#e8f0ff;font-size:13px;resize:vertical;outline:none;line-height:1.6}
+.sym-area:focus{border-color:#c8a951}
+.search-inp{width:100%;padding:12px 17px;border-radius:10px;border:1px solid #1e3a6e;background:#0f2040;color:#e8f0ff;font-size:13px;outline:none;margin-bottom:12px}
+.search-inp:focus{border-color:#c8a951}
+.ex-btn{background:#0d1e3a;border:1px solid #1e3a6e;color:#8ea8d0;padding:5px 12px;border-radius:18px;font-size:11px}
+.ex-btn:hover{border-color:#c8a951;color:#c8a951}
+.submit-btn{width:100%;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:800;letter-spacing:.02em}
+.submit-btn.on{background:#c8a951;color:#0a0800;cursor:pointer}
+.submit-btn.off{background:#3a3020;color:#4a6a9a;cursor:not-allowed}
+.reset-btn{background:transparent;border:1px solid #1e3a6e;color:#8ea8d0;padding:9px 22px;border-radius:8px;font-size:13px}
+.rec-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:12px 15px;margin-bottom:8px;display:flex;gap:13px;align-items:flex-start}
+.rec-card.top{border-color:#c8a951}
+.num-circle{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.urg-emergency{background:#2d0a0a;border:1.5px solid #ff3333;color:#ff4444;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
+.urg-urgent{background:#2d1a00;border:1.5px solid #ff9900;color:#ff9900;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
+.urg-routine{background:#0a2d1a;border:1.5px solid #22c55e;color:#22c55e;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
+.dot1{animation:pulse 1.2s infinite}.dot2{animation:pulse 1.2s .3s infinite}.dot3{animation:pulse 1.2s .6s infinite}
+.disc-section{margin-bottom:22px}
+.disc-title{font-size:14px;font-weight:700;color:#c8a951;margin-bottom:7px}
+.disc-body{font-size:12px;color:#8ea8d0;line-height:1.85}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const {useState, useRef, useEffect} = React;
+const E = React.createElement;
+
+function App() {
+  const [hospitals, setHospitals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [tab, setTab] = useState("directory");
+  const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("All");
+  const [selectedHosp, setSelectedHosp] = useState(null);
+  
+  const [symptoms, setSymptoms] = useState("");
+  const [triageResult, setTriageResult] = useState(null);
+  const [triageLoading, setTriageLoading] = useState(false);
+
+  // Autonomic Asynchronous Data Initialization Pipeline
+  useEffect(() => {
+    fetch('hospitals.json')
+      .then(res => {
+        if (!res.ok) throw new Error("Database dynamic sync mismatch. File unavailable.");
+        return res.json();
+      })
+      .then(data => {
+        setHospitals(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Autonomic load failure: ", err);
+        setError("Unable to stream verified hospital datasets. Re-trying...");
+        setLoading(false);
+      });
+  }, []);
+
+  const handleTriage = (e) => {
+    e.preventDefault();
+    if(!symptoms.trim()) return;
+    setTriageLoading(true);
+    
+    // Fallback client-side matching simulation mimicking original design rules
+    setTimeout(() => {
+      const text = symptoms.lowerCase ? symptoms.toLowerCase() : symptoms;
+      let scoreCard = [];
+      
+      hospitals.forEach(h => {
+        let matches = 0;
+        h.tags.forEach(t => { if(text.includes(t)) matches += 3; });
+        h.specs.forEach(s => {
+          if(text.includes(s.n.toLowerCase())) matches += 4;
+          s.subs.forEach(sub => { if(text.includes(sub.toLowerCase())) matches += 2; });
+        });
+        if(matches > 0) scoreCard.push({ hosp: h, score: matches });
+      });
+
+      scoreCard.sort((a,b) => b.score - a.score);
+      
+      let urgency = "Routine";
+      if(text.includes("chest pain") || text.includes("breathing") || text.includes("accident") || text.includes("severe bleeding")) {
+        urgency = "Emergency";
+      } else if (text.includes("fever") || text.includes("fracture") || text.includes("acute")) {
+        urgency = "Urgent";
+      }
+
+      setTriageResult({
+        urgency,
+        recs: scoreCard.slice(0,3).map(item => item.hosp)
+      });
+      setTriageLoading(false);
+    }, 1200);
+  };
+
+  if (loading) {
+    return E("div", {style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0a1628",color:"#8ea8d0"}},
+      E("div", {style:{fontSize:28,color:"#c8a951",fontWeight:900,fontFamily:"'Playfair Display',serif",marginBottom:12}}, "MediGuide Ethiopia"),
+      E("div", null, 
+        E("span", {className:"dot1", style:{fontSize:20}}, "● "),
+        E("span", {className:"dot2", style:{fontSize:20}}, "● "),
+        E("span", {className:"dot3", style:{fontSize:20}}, "● ")
+      ),
+      E("p", {style:{marginTop:14,fontSize:11,letterSpacing:"0.05em",textTransform:"uppercase"}}, "Streaming Verified Healthcare Matrix...")
+    );
+  }
+
+  if (error) {
+    return E("div", {style:{padding:40, textAlign:"center", background:"#0a1628", minHeight:"100vh"}},
+      E("h2", {style:{color:"#ff4444"}}, "Sync Error"),
+      E("p", {style:{color:"#8ea8d0", marginTop:10}}, error)
+    );
+  }
+
+  // Frontend Filter Matrix
+  const filtered = hospitals.filter(h => {
+    const matchSearch = h.name.toLowerCase().includes(search.toLowerCase()) || 
+                        h.am.includes(search) ||
+                        h.tags.some(t => t.toLowerCase().includes(search.toLowerCase()));
+    const matchType = filterType === "All" || h.type === filterType;
+    return matchSearch && matchType;
+  });
+
+  return E("div", {style:{minHeight:"100vh",display:"flex",flexDirection:"column"}},
+    // Header View
+    E("header", {style:{background:"#0f2040",borderBottom:"1px solid #1e3a6e",padding:"16px 22px",position:"sticky",top:0,zIndex:100}},
+      E("div", {style:{maxWidth:1100,margin:\"0 auto\",display:\"flex\",justifyContent:\"between\",alignItems:\"center\",flexWrap:\"wrap\",gap:12}},
+        E("div", {onClick:()=>setTab("directory"),style:{cursor:\"pointer\"}},
+          E("h1", {style:{fontSize:20,fontWeight:900,color:\"#c8a951\",fontFamily:\"'Playfair Display',serif\"}},"MediGuide Ethiopia"),
+          E("div", {style:{fontSize:10,color:\"#8ea8d0\",letterSpacing:1}},\"ADDIS ABABA SPECIALIZED DIRECTORY\")
+        ),
+        E("nav", {style:{display:\"flex\",gap:8}},
+          E("button",{className:`nav-btn ${tab==="directory"?"active":""}`,onClick:()=>setTab("directory")},"🏥 Medical Directory"),
+          E("button",{className:`nav-btn ${tab==="triage"?"active":""}`,onClick:()=>setTab("triage")},"⚕ AI Symptom Triage"),
+          E("button",{className:`nav-btn ${tab==="disclaimer"?"active":""}`,onClick:()=>setTab("disclaimer")},"📋 Rules")
+        )
+      )
+    ),
+
+    // Main Interactive Views
+    E("main", {style:{flex:1,maxWidth:1100,width:\"100%\",margin:\"0 auto\",padding:\"22px\"}},
+      tab === "directory" ? E("div", {className:\"fade\"},
+        E("div", {style:{display:\"grid\",gridTemplateColumns:\"1fr\",gap:22},className:\"grid-md-2\"},
+          // Left Panel Column
+          E("div", null,
+            E("input", {className:\"search-inp\",placeholder:\"🔍 Search subspecialties, doctors, keywords (e.g. burns, oncology)...\",value:search,onChange:(e)=>setSearch(e.target.value)}),
+            E("div", {style:{display:\"flex\",gap:6,marginBottom:16,flexWrap:\"wrap\"}},
+              [\"All\",\"Public\",\"Private\",\"NGO\"].map(t => 
+                E(\"button\", {key:t,className:`filter-btn ${filterType===t?\"active\":\"\"}`,onClick:()=>setFilterType(t)}, t === \"All\" ? \"🌍 Show All Centers\" : `${t} Centers`)
+              )
+            ),
+            E(\"div\", {style:{maxHeight:\"calc(100vh - 240px)\",overflowY:\"auto\",paddingRight:4}},
+              filtered.length === 0 ? E(\"p\",{style:{color:\"#8ea8d0\",fontStyle:\"italic\"}},\"No matching healthcare facilities found.\") :
+              filtered.map(h => E(\"div\", {key:h.id,className:`hosp-card ${selectedHosp?.id===h.id?\"open\":\"\"}`,onClick:()=>setSelectedHosp(h)},
+                E(\"div\", {style:{display:\"flex\",justifyContent:\"between\",alignItems:\"flex-start\",gap:8}},
+                  E(\"h3\", {style:{fontSize:15,fontWeight:700,color:\"#e8f0ff\"}}, h.name),
+                  E(\"span\", {className: h.type===\"Public\"?\"badge-pub\":h.type===\"Private\"?\"badge-priv\":\"badge-ngo\"}, h.type)
+                ),
+                E(\"div\", {style:{fontSize:12,color:\"#c8a951\",marginTop:2,fontWeight:500}}, h.am),
+                E(\"p\", {style:{fontSize:12,color:\"#8ea8d0\",marginTop:6,lineHeight:1.4}}, h.badge),
+                E(\"div\", {style:{marginTop:8}}, h.tags.slice(0,5).map((tg,idx)=>E(\"span\",{key:idx,className:\"spec-pill\"},tg)))
+              ))
+            )
+          ),
+
+          // Right Panel Details Column
+          E(\"div\", null,
+            selectedHosp ? E(\"div\", {className:\"fade\",style:{background:\"#0f2040\",border:\"1px solid #c8a951\",borderRadius:12,padding:22,position:\"sticky\",top:85}},
+              E(\"div\", {style:{borderBottom:\"1px solid #1e3a6e\",paddingBottom:12,marginBottom:14}},
+                E(\"span\", {className:\"badge-gold\"}, `Est. ${selectedHosp.est || \"-\"} · ${selectedHosp.beds || \"-\"} Beds`),
+                E(\"h2\", {style:{fontSize:18,fontWeight:900,color:\"#c8a951\",marginTop:6,fontFamily:\"'Playfair Display',serif\"}}, selectedHosp.name),
+                E(\"p\", {style:{color:\"#8ea8d0\",fontSize:12}}, selectedHosp.desc)
+              ),
+              E(\"div\", {style:{display:\"grid\",gridTemplateColumns:\"1fr 1fr\",gap:10,marginBottom:16}},
+                E(\"div\",{className:\"loc-card\"},E(\"span\",null,\"📍\"),E(\"div\",null,E(\"b\",{style:{fontSize:11,color:\"#c8a951\"}},\"LOCATION\"),E(\"p\",{style:{fontSize:11,color:\"#8ea8d0\"}},selectedHosp.addr))),
+                E(\"div\",{className:\"loc-card\"},E(\"span\",null,\"📅\"),E(\"div\",null,E(\"b\",{style:{fontSize:11,color:\"#c8a951\"}},\"APPOINTMENT ENTRY\"),E(\"p\",{style:{fontSize:11,color:\"#8ea8d0\"}},selectedHosp.appt)))
+              ),
+              E(\"h4\", {style:{fontSize:12,fontWeight:800,color:\"#e8f0ff\",letterSpacing:1,marginBottom:10}},\"VERIFIED MEDICAL DEPARTMENTS & STAFF\"),
+              E(\"div\", {style:{maxHeight:320,overflowY:\"auto\",display:\"flex\",flexDirection:\"column\",gap:8}},
+                selectedHosp.specs.map((sp,i)=>E(\"div\",{key:i,className:\"sub-card\"},
+                  E(\"div\",{style:{fontWeight:700,color:\"#c8a951\",fontSize:13,display:\"flex\",gap:6}},E(\"span\",null,sp.icon),E(\"span\",null,sp.n)),
+                  E(\"div\",{style:{marginTop:6}},sp.subs.map((su,j)=>E(\"span\",{key:j,style:{display:\"inline-block\",background:\"#070f1e\",fontSize:10,padding:\"2px 6px\",borderRadius:4,margin:\"2px 4px 2px 0\",color:\"#8ea8d0\"}},su))),
+                  sp.docs && sp.docs.length > 0 && E(\"div\",{style:{borderTop:\"1px dashed #1e3a6e\",marginTop:8,paddingTop:6}},
+                    E(\"span\",{style:{fontSize:10,color:\"#8ea8d0\",fontWeight:700,display:\"block\",marginBottom:2}},\"ASSIGNED CONSULTANTS:\"),
+                    sp.docs.map((doc,k)=>E(\"div\",{key:k,style:{fontSize:11,color:\"#e8f0ff\"}},\"👨‍⚕️ \"+doc))
+                  )
+                ))
+              ),
+              selectedHosp.phone && E(\"a\",{href:`tel:${selectedHosp.phone}`,style:{display:\"block\",background:\"#c8a951\",color:\"#0a0800\",textAlign:\"center\",padding:10,borderRadius:8,fontWeight:800,marginTop:14,textDecoration:\"none\"}},\"📞 Call Center: \"+selectedHosp.phone)
+            ) : E(\"div\",{style:{border:\"1px dashed #1e3a6e\",borderRadius:12,padding:40,textAlign:\"center\",color:\"#8ea8d0\",marginTop:40}},\"Select a healthcare facility from the listing to view its verified clinicians and clinical departments.\")
+          )
+        )
+      ) : tab === \"triage\" ? E(\"div\", {className:\"fade\",style:{maxWidth:650,margin:\"0 auto\"}},
+        E(\"h2\",{style:{fontFamily:\"'Playfair Display',serif\",color:\"#c8a951\",fontSize:22,marginBottom:6}},\"AI Symptom Guidance Module\"),
+        E(\"p\",{style:{color:\"#8ea8d0\",fontSize:12,marginBottom:18}},\"Describe your medical conditions naturally. Our sorting logic evaluates entries against subspecialty profiles in Addis Ababa to recommend matching institutions.\"),
+        E(\"form\",{onSubmit:handleTriage},
+          E(\"textarea\",{className:\"sym-area\",value:symptoms,onChange:(e)=>setSymptoms(e.target.value),placeholder:\"Describe symptoms clearly. E.g., 'Child with high fever and shortness of breath' or 'Chronic chest discomfort moving to the left arm'...\"}),
+          E(\"div\",{style:{marginTop:10,textAlign:\"right\"}},
+            E(\"button\",{type:\"submit\",className:`submit-btn ${symptoms.trim()?\"on\":\"off\"}`,disabled:!symptoms.trim() || triageLoading}, triageLoading ? \"Analyzing Signatures...\" : \"Match Suitable Medical Facilities\")
+          )
+        ),
+        triageResult && E(\"div\",{className:\"fade\",style:{marginTop:22,borderTop:\"1px solid #1e3a6e\",paddingTop:20}},
+          E(\"div\",{className: triageResult.urgency===\"Emergency\"?\"urg-emergency\":triageResult.urgency===\"Urgent\"?\"urg-urgent\":\"urg-routine\"},
+            triageResult.urgency === \"Emergency\" ? \"🚨 IMMEDIATE EMERGENCY RESPONSE REQUIRED: Proceed directly to closest trauma facility.\" :
+            triageResult.urgency === \"Urgent\" ? \"⚠️ URGENT CLINICAL EVALUATION RECOMENDED: Schedule a consultation soon.\" : \"🟢 ROUTINE VISIT: Regular schedule acceptable.\"
+          ),
+          E(\"h3\",{style:{fontSize:13,color:\"#c8a951\",marginBottom:10,fontWeight:800}},\"MATCHED SPECIALIZED TREATMENT FACILITIES:\"),
+          triageResult.recs.length === 0 ? E(\"p\",{style:{color:\"#8ea8d0\",fontSize:12}},\"No specific match found. Please reference standard public general hospitals.\") :
+          triageResult.recs.map((r,idx)=>E(\"div\",{key:r.id,className:\"rec-card\"},
+            E(\"div\",{className:\"num-circle\",style:{background:\"#c8a951\",color:\"#0a0800\"}},idx+1),
+            E(\"div\",null,
+              E(\"h4\",{style:{color:\"#e8f0ff\",fontSize:14,fontWeight:700}},r.name),
+              E(\"p\",{style:{color:\"#8ea8d0\",fontSize:11,marginTop:2}},r.badge),
+              E(\"button\",{className:\"ex-btn\",style:{marginTop:6},onClick:()=>{setSelectedHosp(r); setTab(\"directory\");}},\"View Clinic Details →\")
+            )
+          ))
+        )
+      ) : E(\"div\", {className:\"fade\",style:{maxWidth:700,margin:\"0 auto\"}},
+        E(\"h2\",{style:{fontFamily:\"'Playfair Display',serif\",color:\"#c8a951\",fontSize:22,marginBottom:14}},\"MediGuide Legal Framework & Rules\"),
+        E(\"div\",{className:\"disc-section\"},
+          E(\"h3\",{className:\"disc-title\"},\"1. Informational Scope Only\"),
+          E(\"p\",{className:\"disc-body\"},\"All structural listings, phone profiles, and rosters mapped onto this application are maintained via autonomic web research. Data changes dynamically. Users must directly confirm availability prior to emergency travel.\")
+        ),
+        E(\"div\",{className:\"disc-section\"},
+          E(\"h3\",{className:\"disc-title\"},\"2. No Medical Advice\"),
+          E(\"p\",{className:\"disc-body\"},\"The symptom tracker operates via keyword correlation algorithms designed to align medical problems to specialist rosters. It does not replace physical examinations by qualified doctors.\")
+        )
+      )
+    ),
+
+    // Footer
+    E(\"footer\", {style:{background:\"#050e20\",borderTop:\"1px solid #1e3a6e\",padding:\"22px\"}},
+      E(\"div\", {style:{maxWidth:1100,margin:\"0 auto\",textAlign:\"center\"}},
+        E(\"div\", {style:{fontSize:15,fontWeight:900,fontFamily:\"'Playfair Display',serif\",color:\"#c8a951\",marginBottom:6}},\"MediGuide Ethiopia\"),
+        E(\"p\", {style:{fontSize:11,color:\"#8ea8d0\",maxWidth:600,margin:\"0 auto 12px\",lineHeight:1.75}},\"Comprehensive medical directory mapping specialized hospitals and consultants in Addis Ababa, Ethiopia. Data synced via autonomic background agents.\")
+      )
+    )
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(E(App));
+</script>
+</body>
+</html>
