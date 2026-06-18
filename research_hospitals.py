@@ -4,18 +4,28 @@ import requests
 from google import genai
 from google.genai import types
 
+# 1. Define the correct, unified database path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
+
 def load_database():
-    with open('hospitals.json', 'r', encoding='utf-8') as f:
-        return json.load(f)
+    if not os.path.exists(DB_PATH):
+        return []
+    try:
+        with open(DB_PATH, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except Exception:
+        return []
 
 def save_database(data):
-    with open('hospitals.json', 'w', encoding='utf-8') as f:
+    with open(DB_PATH, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def run_weekly_hospital_search():
     print("Initiating autonomic weekly search for newly identified Addis Ababa clinics...")
     db = load_database()
-    existing_names = {h['name'].lower() for h in db}
+    existing_names = {h['name'].lower() for h in db if 'name' in h}
     
     # query local clinical search indices using public Serper/Google engine API keys
     api_key = os.environ.get("SERPER_API_KEY")
@@ -99,8 +109,10 @@ def run_weekly_hospital_search():
                 )
                 structured_data = json.loads(ai_response.text)
                 
-                # Assign a unique tracking token ID
-                structured_data["id"] = max([h["id"] for h in db]) + 1
+                # Assign a unique tracking token ID safely
+                max_id = max([h.get("id", 0) for h in db]) if db else 0
+                structured_data["id"] = max_id + 1
+                
                 db.append(structured_data)
                 existing_names.add(structured_data["name"].lower())
                 new_discoveries += 1
@@ -109,24 +121,9 @@ def run_weekly_hospital_search():
                 
     if new_discoveries > 0:
         save_database(db)
-        print(f"Autonomic framework successfully appended {new_discoveries} new centers.")
+        print(f"Autonomic framework successfully appended {new_discoveries} new centers. Database updated successfully.")
     else:
-        print("No unmapped clinical footprints discovered this week.")
+        print("No unmapped clinical footprints discovered this week. Database remains unchanged.")
 
 if __name__ == "__main__":
     run_weekly_hospital_search()
-import json
-import os
-
-# ... [YOUR EXISTING SCRAPING CODE GOES HERE] ...
-# Assume your scraping loop gathers all hospitals into a python list called `scraped_hospitals_list`
-
-# 1. Define the correct, unified database path
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
-
-# 2. Save the complete list directly to the JSON file
-with open(DB_PATH, 'w', encoding='utf-8') as f:
-    json.dump(scraped_hospitals_list, f, indent=2, ensure_ascii=False)
-
-print("Scraping complete. Database updated successfully.")
