@@ -4,16 +4,15 @@ import os
 
 st.set_page_config(page_title="MediGuide Ethiopia Panel", layout="wide", page_icon="⚕️")
 
-# Force absolute path tracking to prevent container routing glitches
+# Force absolute path tracking 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# FIXED: Pointing to the correct, single standard filename
 DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
 
 def load_db():
     if not os.path.exists(DB_PATH):
-        default_matrix = []
-        with open(DB_PATH, 'w', encoding='utf-8') as f:
-            json.dump(default_matrix, f, indent=2, ensure_ascii=False)
-        return default_matrix
+        # FIXED: Return empty list. Do NOT create a fake seed file that overwrites real data.
+        return [] 
     try:
         with open(DB_PATH, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -38,34 +37,13 @@ m3.metric("Private Centers", len([h for h in db if h.get('type') == 'Private']))
 m4.metric("Total Tracked Specialists", sum([len(s.get('docs', [])) for h in db for s in h.get('specs', [])]))
 
 # --- COMPONENT TABS AREA ---
-tab_edit, tab_sync = st.tabs(["✏️ Edit Live Directories", "🔄 Run Pipeline Worker Manual Overrides"])
+tab_edit, tab_sync = st.tabs(["✏️ Edit Live Directories", "🔄 Run Pipeline Worker"])
 
 with tab_edit:
     st.subheader("Data Matrix Modification Grid")
     
-    # DEFENSIVE CHECK: Handle empty database safely instead of crashing
     if not db:
-        st.info("📂 The database (`hospitals.json`) is currently empty. Go to the 'Run Pipeline Worker Manual Overrides' tab to populate it automatically, or seed your database right now using the button below.")
-        if st.button("➕ Seed Database with Baseline Structure"):
-            sample_node = [{
-                "id": 1,
-                "name": "Tikur Anbessa (Black Lion) Hospital",
-                "am": "ጥቁር አንበሳ ሆስፒታል",
-                "type": "Public",
-                "est": 1964,
-                "beds": 800,
-                "addr": "Lideta Sub-City",
-                "phone": "+251 11 155 1211",
-                "appt": "Walk-in",
-                "web": "https://www.aau.edu.et",
-                "badge": "National Referral Center",
-                "desc": "Primary public referral facility.",
-                "tags": ["oncology", "cardiology"],
-                "specs": []
-            }]
-            save_db(sample_node)
-            st.success("Baseline structural node generated successfully! Refreshing workspace...")
-            st.rerun()
+        st.info("📂 The database (`hospitals.json`) is currently empty. The GitHub Action Autonomic Scheduler will populate this file during its next automated run.")
     else:
         hospital_names = [h["name"] for h in db if "name" in h]
         selected_name = st.selectbox("Select Healthcare Center Node to Audit:", hospital_names)
@@ -97,7 +75,6 @@ with tab_edit:
                 
                 try:
                     target_h["specs"] = json.loads(specs_text)
-                    st.success("JSON validation checks complete.")
                 except Exception:
                     st.error("Invalid nested array payload framework format. Fix structure rules.")
 
@@ -105,27 +82,18 @@ with tab_edit:
                     db[h_idx] = target_h
                     save_db(db)
                     st.balloons()
-                    st.success("Verified changes saved to local directory data framework layer.")
+                    st.success("Verified changes saved to local directory! (Note: changes made here will persist until the next GitHub action override).")
                     st.rerun()
             except StopIteration:
                 st.error("Record selection pointer mismatch.")
 
 with tab_sync:
-    st.subheader("Manual Operational Trigger Mechanisms")
-    st.warning("Running manual updates executes code directly on top of the container instance.")
+    st.subheader("Automated Operational Pipelines")
+    st.info("💡 **Architectural Security Update:** Streamlit Cloud uses ephemeral containers. Running scrapers directly from this UI causes permanent data loss when the container goes to sleep.")
+    st.write("To protect your data framework, all web scraping has been securely delegated to your **GitHub Actions Autonomic Scheduler**.")
     
-    col_a, col_b = st.columns(2)
-    if col_a.button("⚡ Force Run: Weekly New Facility Search"):
-        with st.spinner("Invoking search scraper pipelines..."):
-            os.system("python research_hospitals.py")
-            st.success("Discovery workflow finalized execution loops successfully.")
-            st.rerun()
-            
-    if col_b.button("🧬 Force Run: Bi-Weekly Physician Roster Audit"):
-        with st.spinner("Executing live domain crawling algorithms..."):
-            os.system("python research_personnel.py")
-            st.success("Roster data framework updates synchronized.")
-            st.rerun()
+    # Directly link to your GitHub Action for manual triggers
+    st.markdown("[👉 Click here to Manually Trigger the Scraper inside GitHub Actions](https://github.com/Mulualemadonikidus-alt/MEDIGUIDE-ETHIOPIA-A-PATIENT-GUIDE-to-ACCURATELY-SEEK-HOSPITALS-and-PHYSICIANS-in-ADDIS-ABABA/actions/workflows/autonomic_scheduler.yml)")
 
 # --- FOOTER EMBED PREVIEW AREA ---
 st.markdown("---")
