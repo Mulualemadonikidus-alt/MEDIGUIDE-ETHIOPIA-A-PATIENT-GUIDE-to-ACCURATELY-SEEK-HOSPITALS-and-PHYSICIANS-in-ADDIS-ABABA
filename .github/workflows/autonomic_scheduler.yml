@@ -1,0 +1,51 @@
+name: Autonomic Medical Directory Scheduler
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'      # Run every Sunday at midnight (Weekly Health Center Search)
+    - cron: '0 4 1,15 * *'   # Run on the 1st and 15th of each month (Bi-Weekly Personnel Audit)
+  workflow_dispatch:          # Allows manual trigger overrides via GitHub UI button
+
+jobs:
+  run-research-agents:
+    runs-name: Triggering Autonomous Extraction Engine
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code files
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Initialize Python Core
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup System Dependencies
+        run: |
+          pip install beautifulsoup4 requests google-genai
+
+      - name: Execute Weekly Healthcare Center Audit
+        if: github.event.schedule == '0 0 * * 0' || github.event_with == 'workflow_dispatch'
+        env:
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python research_hospitals.py
+
+      - name: Execute Bi-Weekly Medical Personnel Audit
+        if: github.event.schedule == '0 4 1,15 * *' || github.event_with == 'workflow_dispatch'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python research_personnel.py
+
+      - name: Commit and Push Verified Schema Modifications
+        run: |
+          git config --global user.name "MediGuide Autonomic Bot"
+          git config --global user.email "bot@mediguide-ethiopia.org"
+          git add hospitals.json
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Autonomic Data Sync: Corrected Addis Ababa healthcare matrix profiles [skip ci]"
+            git push origin main
+          else
+            print "Zero data delta variations discovered."
+          fi
