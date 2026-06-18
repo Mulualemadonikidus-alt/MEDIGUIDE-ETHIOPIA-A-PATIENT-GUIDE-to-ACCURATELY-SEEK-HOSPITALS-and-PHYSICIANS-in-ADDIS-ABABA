@@ -4,17 +4,28 @@ import os
 
 st.set_page_config(page_title="MediGuide Ethiopia Panel", layout="wide", page_icon="⚕️")
 
+# Force absolute path tracking to prevent container routing glitches
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
+
 def load_db():
-    with open('hospitals.json', 'r', encoding='utf-8') as f:
+    if not os.path.exists(DB_PATH):
+        # Fallback: Create a clean empty data matrix if the file is physically missing
+        default_matrix = []
+        with open(DB_PATH, 'w', encoding='utf-8') as f:
+            json.dump(default_matrix, f, indent=2, ensure_ascii=False)
+        return default_matrix
+    with open(DB_PATH, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def save_db(data):
-    with open('hospitals.json', 'w', encoding='utf-8') as f:
+    with open(DB_PATH, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 st.title("⚕️ MediGuide Ethiopia — Admin Control Center")
 st.caption("Autonomic Operational Workspace for Monitoring Addis Ababa Healthcare Matrices")
 
+# This will now load perfectly without throwing a FileNotFoundError
 db = load_db()
 
 # --- HIGH LEVEL PERFORMANCE MATRIX ---
