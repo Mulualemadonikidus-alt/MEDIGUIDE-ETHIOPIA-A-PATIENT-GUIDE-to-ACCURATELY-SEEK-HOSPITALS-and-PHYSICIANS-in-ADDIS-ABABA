@@ -3,10 +3,10 @@ import json
 import os
 import subprocess
 import sys
+import html
 
 st.set_page_config(page_title="MediGuide Ethiopia Panel", layout="wide", page_icon="⚕️")
 
-# Resolve absolute tracking paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
 
@@ -44,26 +44,6 @@ with tab_edit:
     st.subheader("Data Matrix Modification Grid")
     if not db:
         st.info("📂 The database (hospitals.json) is currently empty. Head to the pipeline tab to execute an autonomous search query.")
-        if st.button("➕ Seed Database with Baseline Structure"):
-            sample_node = [{
-                "id": 1,
-                "name": "Tikur Anbessa (Black Lion) Hospital",
-                "am": "ጥቁር አንበሳ ሆስፒታል",
-                "type": "Public",
-                "est": 1964,
-                "beds": 800,
-                "addr": "Lideta Sub-City, Addis Ababa",
-                "phone": "+251 11 155 1211",
-                "appt": "Walk-in / Referral",
-                "web": "https://www.aau.edu.et",
-                "badge": "National Referral Center",
-                "desc": "The primary public university referral hospital in Ethiopia.",
-                "tags": ["oncology", "cardiology", "pediatrics"],
-                "specs": []
-            }]
-            save_db(sample_node)
-            st.success("Baseline structural node generated! Reloading framework...")
-            st.rerun()
     else:
         hospital_names = [h["name"] for h in db if "name" in h]
         selected_name = st.selectbox("Select Healthcare Center Node to Audit:", hospital_names)
@@ -98,45 +78,41 @@ with tab_edit:
 
 with tab_sync:
     st.subheader("Manual Operational Trigger Mechanisms")
-    st.markdown("Invoking these workers activates background search instances using your system API Secrets.")
     
-    # Securely retrieve secret keys from Streamlit Cloud Environment
     gemini_key = st.secrets.get("GEMINI_API_KEY", "")
     serper_key = st.secrets.get("SERPER_API_KEY", "")
     
     if not gemini_key or not serper_key:
-        st.error("🚨 Cloud deployment API keys are missing. Verify your keys are stored securely inside the Streamlit App Secret console.")
+        st.error("🚨 Cloud deployment API keys are missing inside the Streamlit Secrets console.")
     
     col_a, col_b = st.columns(2)
-    
-    # Inject secrets into background processes seamlessly
     env_context = os.environ.copy()
     env_context["GEMINI_API_KEY"] = gemini_key
     env_context["SERPER_API_KEY"] = serper_key
     
     if col_a.button("⚡ Force Run: Weekly New Hospital Deep Search"):
-        if gemini_key and serper_key:
-            with st.spinner("Autonomous Agents executing search queries via Serper & Gemini..."):
-                script_path = os.path.join(BASE_DIR, "research_hospitals.py")
-                result = subprocess.run([sys.executable, script_path], capture_output=True, text=True, env=env_context)
-                if result.returncode == 0:
-                    st.success("Discovery workflow finalized execution loops successfully.")
-                    st.rerun()
-                else:
-                    st.error(f"Execution Error: {result.stderr}")
+        with st.spinner("Executing live search requests..."):
+            script_path = os.path.join(BASE_DIR, "research_hospitals.py")
+            result = subprocess.run([sys.executable, script_path], capture_output=True, text=True, env=env_context)
+            if result.returncode == 0:
+                st.success("Discovery workflow finalized execution loops successfully.")
+                st.rerun()
+            else:
+                st.error("❌ Background Process Crashed!")
+                st.code(f"Error Log (stderr):\n{result.stderr}\n\nConsole Log (stdout):\n{result.stdout}")
                     
     if col_b.button("🧬 Force Run: Bi-Weekly Physician Roster Audit"):
-        if gemini_key and serper_key:
-            with st.spinner("Crawling clinician rosters..."):
-                script_path = os.path.join(BASE_DIR, "research_personnel.py")
-                result = subprocess.run([sys.executable, script_path], capture_output=True, text=True, env=env_context)
-                if result.returncode == 0:
-                    st.success("Roster synchronization complete.")
-                    st.rerun()
-                else:
-                    st.error(f"Execution Error: {result.stderr}")
+        with st.spinner("Crawling clinician rosters..."):
+            script_path = os.path.join(BASE_DIR, "research_personnel.py")
+            result = subprocess.run([sys.executable, script_path], capture_output=True, text=True, env=env_context)
+            if result.returncode == 0:
+                st.success("Roster synchronization complete.")
+                st.rerun()
+            else:
+                st.error("❌ Background Process Crashed!")
+                st.code(f"Error Log (stderr):\n{result.stderr}\n\nConsole Log (stdout):\n{result.stdout}")
 
-# --- HTML PREVIEW FALLBACK AND DETECTOR ---
+# --- COMPLIANT HTML VIEW CANVAS Injection ---
 st.markdown("---")
 st.subheader("Live Web Client View Mirror")
 html_options = ["index.html", "index.html.html"]
@@ -144,6 +120,10 @@ target_html = next((f for f in html_options if os.path.exists(os.path.join(BASE_
 
 if target_html:
     with open(os.path.join(BASE_DIR, target_html), "r", encoding="utf-8") as f:
-        st.components.v1.html(f.read(), height=650, scrolling=True)
+        html_content = f.read()
+        # Escape HTML structure parameters safely to inject inside srcdoc
+        escaped_html = html.escape(html_content)
+        iframe_style_wrapper = f'<iframe srcdoc="{escaped_html}" width="100%" height="650" style="border:none; background:white; border-radius:8px;"></iframe>'
+        st.html(iframe_style_wrapper)
 else:
-    st.info("Upload an index.html file to your root directory to map your front-end preview canvas here.")
+    st.info("Upload your index.html file to review frontend canvas rendering benchmarks.")
