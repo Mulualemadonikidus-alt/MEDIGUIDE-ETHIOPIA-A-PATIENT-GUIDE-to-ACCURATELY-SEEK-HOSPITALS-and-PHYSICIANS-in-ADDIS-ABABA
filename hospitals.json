@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "name": "Tikur Anbessa (Black Lion) Specialized Hospital",
+    "am": "ጥቁር አንበሳ ሆስፒታል",
+    "type": "Public",
+    "est": 1964,
+    "beds": 800,
+    "addr": "Lideta Sub-City, Addis Ababa",
+    "phone": "+251 11 155 1211",
+    "appt": "Referral Required",
+    "web": "https://www.aau.edu.et",
+    "badge": "National Referral Center",
+    "desc": "The largest public specialized referral hospital in Ethiopia, operating under Addis Ababa University.",
+    "tags": ["Oncology", "Cardiology", "Pediatrics", "Emergency"],
+    "specs": []
+  }
+]
