@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediGuide Ethiopia — Find Care in Addis Ababa</title>
-    <!-- Tailwind CSS for high-performance UI rendering -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Google Fonts for crisp readability -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -14,7 +12,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- HERO & SEARCH SECTION -->
     <header class="bg-gradient-to-br from-teal-700 to-cyan-900 text-white shadow-md">
         <div class="max-w-6xl mx-auto px-4 py-8 md:py-12 text-center">
             <div class="inline-flex items-center gap-2 bg-teal-600/30 border border-teal-400/20 px-3 py-1.5 rounded-full text-sm mb-4 backdrop-blur-xs">
@@ -28,7 +25,6 @@
                 Instantly navigate specialized hospitals, emergency centers, and clinical specialists across the capital.
             </p>
 
-            <!-- Dual-Action Search Interface -->
             <div class="max-w-2xl mx-auto bg-white p-2 rounded-xl md:rounded-2xl shadow-xl flex flex-col md:flex-row gap-2">
                 <div class="flex-1 flex items-center px-3 border-b md:border-b-0 md:border-r border-slate-100 py-2">
                     <svg class="w-5 h-5 text-slate-400 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -45,10 +41,8 @@
         </div>
     </header>
 
-    <!-- CONTENT LAYOUT HUB -->
     <main class="max-w-6xl mx-auto w-full px-4 py-8 flex-1">
         
-        <!-- Quick Tag Navigation Pills -->
         <div class="mb-6 flex flex-wrap gap-2 items-center">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-2">Quick Filters:</span>
             <button onclick="setTagFilter('All')" class="tag-btn bg-teal-700 text-white px-3 py-1 rounded-full text-xs font-medium transition-all">All Specializations</button>
@@ -58,23 +52,19 @@
             <button onclick="setTagFilter('emergency')" class="tag-btn bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-medium transition-all">Emergency / ICU</button>
         </div>
 
-        <!-- Result Matrix Headline -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                 Available Medical Centers <span id="resultCount" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
             </h2>
         </div>
 
-        <!-- Dynamic Facility Grid Loading Canvas -->
         <div id="hospitalGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Loading State Template Placeholder -->
             <div class="col-span-full py-12 text-center text-slate-400 animate-pulse">
                 Building secure connection to institutional registers...
             </div>
         </div>
     </main>
 
-    <!-- PATIENT UTILITY DETAILS DRAWER (MODAL OVERLAY) -->
     <div id="detailsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col">
             <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50 rounded-t-2xl">
@@ -111,21 +101,18 @@
                 <div>
                     <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">On-Duty Specialized Clinical Rosters</h4>
                     <div id="modalSpecs" class="space-y-3">
-                        <!-- Dynamic specialized clinical nodes append here -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PERSISTENT FOOTER UTILITY -->
     <footer class="bg-white border-t border-slate-200 py-6 mt-12">
         <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-400">
             &copy; 2026 MediGuide Ethiopia. Validated local medical mapping resources. Emergency assistance channels require localized on-site clinical evaluation.
         </div>
     </footer>
 
-    <!-- CLIENT OPERATIONAL INTELLIGENCE LOGIC -->
     <script>
         let hospitalDataset = [];
         let activeTagFilter = 'All';
@@ -137,8 +124,13 @@
         });
 
         async function fetchHospitals() {
+            // Guard clause: If data has been injected directly by app.py, skip the fetch attempt and render immediately
+            if (hospitalDataset && hospitalDataset.length > 0) {
+                applyFilters();
+                return;
+            }
             try {
-                // Fetch the central database structure generated by your pipeline workers
+                // Standalone fallback: Fetch data via relative directory mapping if running as a separate deployment link
                 const response = await fetch('./hospitals.json');
                 if (!response.ok) throw new Error("Database interface unreachable.");
                 hospitalDataset = await response.json();
@@ -163,18 +155,19 @@
         }
 
         function applyFilters() {
-            const query = document.getElementById("searchInput").value.toLowerCase().strip();
+            // BUGFIX: Changed the non-existent JavaScript method .strip() to .trim() to keep the engine from breaking
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
             const sector = document.getElementById("typeFilter").value;
 
             const filtered = hospitalDataset.filter(h => {
                 const matchesSearch = 
-                    h.name.toLowerCase().includes(query) || 
+                    (h.name && h.name.toLowerCase().includes(query)) || 
                     (h.am && h.am.includes(query)) ||
-                    h.desc.toLowerCase().includes(query) ||
-                    h.tags.some(t => t.toLowerCase().includes(query));
+                    (h.desc && h.desc.toLowerCase().includes(query)) ||
+                    (h.tags && h.tags.some(t => t.toLowerCase().includes(query)));
                 
                 const matchesSector = (sector === "All" || h.type === sector);
-                const matchesTag = (activeTagFilter === "All" || h.tags.some(t => t.toLowerCase() === activeTagFilter.toLowerCase()));
+                const matchesTag = (activeTagFilter === "All" || (h.tags && h.tags.some(t => t.toLowerCase() === activeTagFilter.toLowerCase())));
 
                 return matchesSearch && matchesSector && matchesTag;
             });
@@ -202,9 +195,9 @@
                     </div>
                     <h3 class="font-bold text-slate-900 text-base leading-snug line-clamp-1">${h.name}</h3>
                     <p class="text-xs text-slate-400 font-medium mb-2">${h.am || ''}</p>
-                    <p class="text-xs text-slate-500 line-clamp-2 mb-4 flex-1">${h.desc}</p>
+                    <p class="text-xs text-slate-500 line-clamp-2 mb-4 flex-1">${h.desc || ''}</p>
                     <div class="flex items-center gap-1 mb-4 flex-wrap">
-                        ${h.tags.slice(0, 3).map(t => `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-sm text-[10px] font-medium font-mono">#${t}</span>`).join('')}
+                        ${h.tags ? h.tags.slice(0, 3).map(t => `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-sm text-[10px] font-medium font-mono">#${t}</span>`).join('') : ''}
                     </div>
                     <button onclick="openModal(${h.id})" class="w-full bg-slate-900 text-white hover:bg-teal-700 text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors cursor-pointer text-center">
                         Review Clinicians & Access Details
@@ -220,18 +213,18 @@
             document.getElementById("modalType").innerText = h.type;
             document.getElementById("modalName").innerText = h.name;
             document.getElementById("modalAmharic").innerText = h.am || '';
-            document.getElementById("modalDesc").innerText = h.desc;
-            document.getElementById("modalAddr").innerText = h.addr;
+            document.getElementById("modalDesc").innerText = h.desc || '';
+            document.getElementById("modalAddr").innerText = h.addr || 'Addis Ababa';
             
             const phoneEl = document.getElementById("modalPhoneLink");
-            phoneEl.innerText = h.phone;
-            phoneEl.href = `tel:${h.phone}`;
+            phoneEl.innerText = h.phone || 'N/A';
+            phoneEl.href = h.phone ? `tel:${h.phone}` : '#';
             
-            document.getElementById("modalAppt").innerText = h.appt;
+            document.getElementById("modalAppt").innerText = h.appt || 'Direct Walk-In Accepted';
             
             const webEl = document.getElementById("modalWeb");
-            webEl.innerText = h.web;
-            webEl.href = h.web;
+            webEl.innerText = h.web || 'None';
+            webEl.href = h.web || '#';
 
             // Render out nested specialized clinical doctor paths efficiently
             const specsContainer = document.getElementById("modalSpecs");
@@ -244,12 +237,12 @@
                             <span class="w-1.5 h-1.5 bg-teal-500 rounded-full"></span> ${s.dep}
                         </h5>
                         <ul class="space-y-2 pl-2.5">
-                            ${s.docs.map(d => `
+                            ${s.docs ? s.docs.map(d => `
                                 <li class="text-xs border-l-2 border-slate-200 pl-2">
                                     <span class="font-semibold text-slate-800 block text-[13px]">${d.name}</span>
-                                    <span class="text-slate-500 font-medium block text-[11px]">${d.sub} — <span class="italic text-slate-400">${d.edu}</span></span>
+                                    <span class="text-slate-500 font-medium block text-[11px]">${d.sub || ''} — <span class="italic text-slate-400">${d.edu || ''}</span></span>
                                 </li>
-                            `).join('')}
+                            `).join('') : ''}
                         </ul>
                     </div>
                 `).join('');
