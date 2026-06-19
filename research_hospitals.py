@@ -3,81 +3,79 @@ import json
 import requests
 import google.generativeai as genai
 
-# Grab environment variables passed down safely from app.py
+# Force absolute path coordination so files match app.py location exactly
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
+
 SERPER_KEY = os.environ.get("SERPER_API_KEY")
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 
-DB_PATH = "hospitals.json"
-
 def run_research():
     if not SERPER_KEY or not GEMINI_KEY:
-        print("Missing required API orchestration configuration variables.")
+        print("Error: Missing secure execution environment variables.")
         return
     
-    print("Initiating web discovery sweeps for Addis Ababa healthcare nodes...")
+    print("Launching live crawling system for Addis Ababa medical nodes...")
     
-    # 1. Query the Serper Google Search Engine Layer
     headers = {"X-API-KEY": SERPER_KEY, "Content-Type": "application/json"}
-    payload = json.dumps({"q": "specialized hospitals medical centers in Addis Ababa Ethiopia address phone"})
+    payload = json.dumps({
+        "q": "best specialized hospitals clinics contact address Addis Ababa Ethiopia",
+        "num": 15
+    })
     
     try:
         response = requests.post("https://google.serper.dev/search", headers=headers, data=payload)
         search_results = response.json()
     except Exception as e:
-        print(f"Network processing bottleneck occurred: {e}")
+        print(f"Network error: {e}")
         return
 
-    # 2. Package raw intelligence data for processing
-    raw_data_dump = str(search_results.get("organic", []))[:4000] 
+    raw_intelligence = str(search_results.get("organic", []))[:5000]
 
-    # 3. Configure Gemini context engines
+    # Initialize modern Gemini interface 
     genai.configure(api_key=GEMINI_KEY)
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     prompt = f"""
-    You are an expert medical database cleaner. Analyze this raw text data concerning healthcare centers in Addis Ababa:
-    {raw_data_dump}
+    Analyze this raw search intelligence data for Addis Ababa healthcare facilities:
+    {raw_intelligence}
     
-    Convert this information into a valid, minified JSON array of objects representing unique hospitals. 
-    Each object MUST strict match this exact structural schema dictionary layout format:
+    Generate a clean JSON list of objects matching this exact database schema model:
     {{
       "id": 1,
-      "name": "Official English Hospital Name",
-      "am": "Amharic Translation if known or empty string",
+      "name": "Official Hospital Name",
+      "am": "Amharic Name translation if known",
       "type": "Public" or "Private",
-      "est": 2000,
-      "beds": 100,
-      "addr": "Sub-City location details",
-      "phone": "Telephone hotline string",
-      "appt": "Walk-in",
-      "web": "URL string",
-      "badge": "Verified Info",
-      "desc": "Short overview text summary descriptive analysis",
-      "tags": ["general", "emergency"],
+      "est": 1990,
+      "beds": 150,
+      "addr": "Specific sub-city area location info",
+      "phone": "Telephone contact number",
+      "appt": "Walk-in or Referral required",
+      "web": "Website URL link string",
+      "badge": "Specialty Center Highlight",
+      "desc": "Short overview summary statement of their strengths",
+      "tags": ["cardiology", "maternity"],
       "specs": []
     }}
-    Return ONLY the clean raw valid minified JSON array. Do not append markdown wrapper blocks or code tags.
     """
     
     try:
-        ai_response = model.generate_content(prompt)
-        cleaned_text = ai_response.text.strip()
+        # Request native structured JSON handling directly from the AI model
+        ai_response = model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
+        )
         
-        # Strip potential markdown wrappers securely
-        if cleaned_text.startswith("```json"):
-            cleaned_text = cleaned_text[7:]
-        if cleaned_text.endswith("```"):
-            cleaned_text = cleaned_text[:-3]
+        parsed_data = json.loads(ai_response.text.strip())
         
-        parsed_json = json.loads(cleaned_text.strip())
-        
-        # Commit freshly discovered updates straight to the database layer
+        # Verify and merge with existing database structures
         with open(DB_PATH, "w", encoding="utf-8") as f:
-            json.dump(parsed_json, f, indent=2, ensure_ascii=False)
-        print("Live database successfully populated with fresh discovery arrays.")
+            json.dump(parsed_data, f, indent=2, ensure_ascii=False)
+            
+        print(f"Success! Saved {len(parsed_data)} live infrastructure entities to {DB_PATH}")
         
     except Exception as e:
-        print(f"Parsing engine exception run handled: {e}")
+        print(f"Processing error during dataset transformation: {e}")
 
 if __name__ == "__main__":
     run_research()
