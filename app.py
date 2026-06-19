@@ -34,10 +34,29 @@ db = load_db()
 # --- INSTANT SNAPSHOT METRICS ---
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("Total Active Centers", len(db))
-m2.metric("Public Institutions", len([h for h in db if h.get('type') == 'Public']))
-m3.metric("Private Centers", len([h for h in db if h.get('type') == 'Private']))
-m4.metric("Tracked Specialists", sum([len(s.get('docs', [])) for h in db for s in h.get('specs', [])]))
 
+# Defensive calculations to prevent malformed data strings from crashing the app
+public_count = sum(1 for h in db if isinstance(h, dict) and h.get('type') == 'Public')
+private_count = sum(1 for h in db if isinstance(h, dict) and h.get('type') == 'Private')
+
+total_specialists = 0
+for h in db:
+    if isinstance(h, dict):
+        specs = h.get('specs', [])
+        if isinstance(specs, list):
+            for s in specs:
+                # Strictly verify that 's' is a dictionary object before calling .get()
+                if isinstance(s, dict):
+                    docs = s.get('docs', [])
+                    if isinstance(docs, list):
+                        total_specialists += len(docs)
+                elif isinstance(s, str):
+                    # Data anomaly handling: If it's a plain string, it doesn't contain a nested docs list
+                    pass
+
+m2.metric("Public Institutions", public_count)
+m3.metric("Private Centers", private_count)
+m4.metric("Tracked Specialists", total_specialists)
 tab_edit, tab_sync = st.tabs(["✏️ Edit Live Directories", "🔄 Run Pipeline Worker Manual Overrides"])
 
 with tab_edit:
