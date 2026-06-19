@@ -1,7 +1,8 @@
 import os
 import json
 import requests
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import sys
 
 # Force absolute path coordination so files match app.py location exactly
@@ -40,9 +41,8 @@ def run_research():
     raw_intelligence = str(organic)[:5000]
 
     try:
-        # Initialize Gemini interface 
-        genai.configure(api_key=GEMINI_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Initialize the modern, supported Google GenAI Client
+        client = genai.Client(api_key=GEMINI_KEY)
         
         prompt = f"""
         Analyze this raw search intelligence data for Addis Ababa healthcare facilities:
@@ -69,10 +69,13 @@ def run_research():
         ]
         """
         
-        # Request native structured JSON handling directly from the AI model
-        ai_response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
+        # Request native structured JSON handling using the updated SDK call method
+        ai_response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+            ),
         )
         
         parsed_data = json.loads(ai_response.text.strip())
