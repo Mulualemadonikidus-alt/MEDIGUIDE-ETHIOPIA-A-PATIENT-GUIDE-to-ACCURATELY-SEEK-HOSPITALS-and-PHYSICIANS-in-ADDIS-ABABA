@@ -1,287 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta name="description" content="MediGuide Ethiopia — Comprehensive directory of specialized hospitals, medical centers, specialists and sub-specialists in Addis Ababa, Ethiopia. AI-powered symptom checker to find the right care."/>
-<meta name="keywords" content="hospitals Addis Ababa, Ethiopia doctors, specialized hospital Ethiopia, Tikur Anbessa, Addis Cardiac, medical directory Ethiopia"/>
-<meta property="og:title" content="MediGuide Ethiopia — Addis Ababa Medical Directory"/>
-<meta property="og:description" content="Find specialized hospitals, doctors and sub-specialists in Addis Ababa. AI symptom checker guides you to the right care."/>
-<meta property="og:type" content="website"/>
-<title>MediGuide Ethiopia — Addis Ababa Specialized Medical Directory</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚕</text></svg>"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a1628;color:#e8f0ff;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a6e;border-radius:3px}
-@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.fade{animation:fadeIn .35s ease}
-button{cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
-textarea,input{font-family:'Inter',sans-serif}
-a{color:#3b82f6;text-decoration:none}a:hover{text-decoration:underline}
-.nav-btn{border:1px solid #1e3a6e;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:#8ea8d0}
-.nav-btn.active,.nav-btn:hover{background:#c8a951;color:#0a0800;border-color:#c8a951}
-.filter-btn{border:1px solid #1e3a6e;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:#0f2040;color:#8ea8d0}
-.filter-btn.active,.filter-btn:hover{background:#c8a951;color:#0a0800;border-color:#c8a951}
-.hosp-card{background:#122040;border:1px solid #1e3a6e;border-radius:12px;padding:18px 22px;cursor:pointer;transition:all .2s;margin-bottom:10px}
-.hosp-card:hover,.hosp-card.open{background:#163060;border-color:#c8a951}
-.sub-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:13px 15px}
-.stat-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:14px 16px;text-align:center}
-.quick-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:13px 15px}
-.loc-card{background:#070f1e;border:1px solid #1e3a6e;border-radius:10px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start}
-.badge-pub{background:#1a3a1a;color:#22a65c;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
-.badge-priv{background:#1a2a3a;color:#3b82f6;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
-.badge-ngo{background:#2a1a3a;color:#c084fc;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
-.badge-gold{background:#1e2a0a;color:#c8a951;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
-.spec-pill{display:inline-block;background:#0d1e3a;color:#8ea8d0;font-size:10px;padding:2px 7px;border-radius:10px;margin:2px 3px 2px 0;border:1px solid #1e3a6e}
-.sym-area{width:100%;min-height:95px;padding:13px 15px;border-radius:10px;border:1px solid #1e3a6e;background:#070f1e;color:#e8f0ff;font-size:13px;resize:vertical;outline:none;line-height:1.6}
-.sym-area:focus{border-color:#c8a951}
-.search-inp{width:100%;padding:12px 17px;border-radius:10px;border:1px solid #1e3a6e;background:#0f2040;color:#e8f0ff;font-size:13px;outline:none;margin-bottom:12px}
-.search-inp:focus{border-color:#c8a951}
-.ex-btn{background:#0d1e3a;border:1px solid #1e3a6e;color:#8ea8d0;padding:5px 12px;border-radius:18px;font-size:11px}
-.ex-btn:hover{border-color:#c8a951;color:#c8a951}
-.submit-btn{width:100%;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:800;letter-spacing:.02em}
-.submit-btn.on{background:#c8a951;color:#0a0800;cursor:pointer}
-.submit-btn.off{background:#3a3020;color:#4a6a9a;cursor:not-allowed}
-.reset-btn{background:transparent;border:1px solid #1e3a6e;color:#8ea8d0;padding:9px 22px;border-radius:8px;font-size:13px}
-.rec-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:12px 15px;margin-bottom:8px;display:flex;gap:13px;align-items:flex-start}
-.rec-card.top{border-color:#c8a951}
-.num-circle{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
-.urg-emergency{background:#2d0a0a;border:1.5px solid #ff3333;color:#ff4444;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
-.urg-urgent{background:#2d1a00;border:1.5px solid #ff9900;color:#ff9900;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
-.urg-routine{background:#0a2d1a;border:1.5px solid #22c55e;color:#22c55e;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
-.dot1{animation:pulse 1.2s infinite}.dot2{animation:pulse 1.2s .3s infinite}.dot3{animation:pulse 1.2s .6s infinite}
-.disc-section{margin-bottom:22px}
-.disc-title{font-size:14px;font-weight:700;color:#c8a951;margin-bottom:7px}
-.disc-body{font-size:12px;color:#8ea8d0;line-height:1.85}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediGuide Ethiopia — Find Care in Addis Ababa</title>
+    <!-- Tailwind CSS for high-performance UI rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts for crisp readability -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body>
-<div id="root"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script>
-const {useState, useRef, useEffect} = React;
-const E = React.createElement;
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-function App() {
-  const [hospitals, setHospitals] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    <!-- HERO & SEARCH SECTION -->
+    <header class="bg-gradient-to-br from-teal-700 to-cyan-900 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-8 md:py-12 text-center">
+            <div class="inline-flex items-center gap-2 bg-teal-600/30 border border-teal-400/20 px-3 py-1.5 rounded-full text-sm mb-4 backdrop-blur-xs">
+                <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Addis Ababa Live Directory
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-3">
+                MediGuide Ethiopia <span class="text-teal-300">መድኃኒት መሪ</span>
+            </h1>
+            <p class="text-teal-100 max-w-xl mx-auto text-sm md:text-base mb-8">
+                Instantly navigate specialized hospitals, emergency centers, and clinical specialists across the capital.
+            </p>
 
-  const [tab, setTab] = useState("directory");
-  const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("All");
-  const [selectedHosp, setSelectedHosp] = useState(null);
-  
-  const [symptoms, setSymptoms] = useState("");
-  const [triageResult, setTriageResult] = useState(null);
-  const [triageLoading, setTriageLoading] = useState(false);
+            <!-- Dual-Action Search Interface -->
+            <div class="max-w-2xl mx-auto bg-white p-2 rounded-xl md:rounded-2xl shadow-xl flex flex-col md:flex-row gap-2">
+                <div class="flex-1 flex items-center px-3 border-b md:border-b-0 md:border-r border-slate-100 py-2">
+                    <svg class="w-5 h-5 text-slate-400 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="searchInput" placeholder="Search condition, specialty, or hospital name..." class="w-full text-slate-900 focus:outline-hidden text-base">
+                </div>
+                <div class="w-full md:w-48 px-2 py-1">
+                    <select id="typeFilter" class="w-full h-full bg-transparent text-slate-700 focus:outline-hidden text-sm font-medium cursor-pointer py-2 md:py-0">
+                        <option value="All">All Sectors</option>
+                        <option value="Public">Public Hospitals</option>
+                        <option value="Private">Private Clinics</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
 
-  // Autonomic Asynchronous Data Initialization Pipeline
-  useEffect(() => {
-    fetch('hospitals.json')
-      .then(res => {
-        if (!res.ok) throw new Error("Database dynamic sync mismatch. File unavailable.");
-        return res.json();
-      })
-      .then(data => {
-        setHospitals(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Autonomic load failure: ", err);
-        setError("Unable to stream verified hospital datasets. Re-trying...");
-        setLoading(false);
-      });
-  }, []);
+    <!-- CONTENT LAYOUT HUB -->
+    <main class="max-w-6xl mx-auto w-full px-4 py-8 flex-1">
+        
+        <!-- Quick Tag Navigation Pills -->
+        <div class="mb-6 flex flex-wrap gap-2 items-center">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-2">Quick Filters:</span>
+            <button onclick="setTagFilter('All')" class="tag-btn bg-teal-700 text-white px-3 py-1 rounded-full text-xs font-medium transition-all">All Specializations</button>
+            <button onclick="setTagFilter('cardiology')" class="tag-btn bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-medium transition-all">Cardiology</button>
+            <button onclick="setTagFilter('pediatrics')" class="tag-btn bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-medium transition-all">Pediatrics</button>
+            <button onclick="setTagFilter('oncology')" class="tag-btn bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-medium transition-all">Oncology</button>
+            <button onclick="setTagFilter('emergency')" class="tag-btn bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-medium transition-all">Emergency / ICU</button>
+        </div>
 
-  const handleTriage = (e) => {
-    e.preventDefault();
-    if(!symptoms.trim()) return;
-    setTriageLoading(true);
-    
-    // Fallback client-side matching simulation mimicking original design rules
-    setTimeout(() => {
-      const text = symptoms.lowerCase ? symptoms.toLowerCase() : symptoms;
-      let scoreCard = [];
-      
-      hospitals.forEach(h => {
-        let matches = 0;
-        h.tags.forEach(t => { if(text.includes(t)) matches += 3; });
-        h.specs.forEach(s => {
-          if(text.includes(s.n.toLowerCase())) matches += 4;
-          s.subs.forEach(sub => { if(text.includes(sub.toLowerCase())) matches += 2; });
+        <!-- Result Matrix Headline -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                Available Medical Centers <span id="resultCount" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
+            </h2>
+        </div>
+
+        <!-- Dynamic Facility Grid Loading Canvas -->
+        <div id="hospitalGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loading State Template Placeholder -->
+            <div class="col-span-full py-12 text-center text-slate-400 animate-pulse">
+                Building secure connection to institutional registers...
+            </div>
+        </div>
+    </main>
+
+    <!-- PATIENT UTILITY DETAILS DRAWER (MODAL OVERLAY) -->
+    <div id="detailsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50 rounded-t-2xl">
+                <div>
+                    <span id="modalType" class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-sm bg-teal-100 text-teal-800 mb-1 inline-block"></span>
+                    <h3 id="modalName" class="text-xl font-bold text-slate-900"></h3>
+                    <p id="modalAmharic" class="text-sm text-slate-500 font-medium"></p>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-200 transition-all">&times;</button>
+            </div>
+            <div class="p-6 space-y-6 overflow-y-auto flex-1">
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Facility Insights</h4>
+                    <p id="modalDesc" class="text-slate-600 text-sm leading-relaxed"></p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div>
+                        <span class="text-[11px] text-slate-400 block font-medium">📍 Emergency Access Point</span>
+                        <span id="modalAddr" class="text-sm text-slate-800 font-semibold"></span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block font-medium">📞 Direct Helpline</span>
+                        <a id="modalPhoneLink" href="#" class="text-sm text-teal-600 font-bold hover:underline"></a>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block font-medium">⏳ Admission Strategy</span>
+                        <span id="modalAppt" class="text-sm text-slate-800 font-semibold"></span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block font-medium">🌐 Web Platform</span>
+                        <a id="modalWeb" href="#" target="_blank" class="text-sm text-cyan-600 font-semibold hover:underline block truncate"></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">On-Duty Specialized Clinical Rosters</h4>
+                    <div id="modalSpecs" class="space-y-3">
+                        <!-- Dynamic specialized clinical nodes append here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PERSISTENT FOOTER UTILITY -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-400">
+            &copy; 2026 MediGuide Ethiopia. Validated local medical mapping resources. Emergency assistance channels require localized on-site clinical evaluation.
+        </div>
+    </footer>
+
+    <!-- CLIENT OPERATIONAL INTELLIGENCE LOGIC -->
+    <script>
+        let hospitalDataset = [];
+        let activeTagFilter = 'All';
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchHospitals();
+            document.getElementById("searchInput").addEventListener("input", applyFilters);
+            document.getElementById("typeFilter").addEventListener("change", applyFilters);
         });
-        if(matches > 0) scoreCard.push({ hosp: h, score: matches });
-      });
 
-      scoreCard.sort((a,b) => b.score - a.score);
-      
-      let urgency = "Routine";
-      if(text.includes("chest pain") || text.includes("breathing") || text.includes("accident") || text.includes("severe bleeding")) {
-        urgency = "Emergency";
-      } else if (text.includes("fever") || text.includes("fracture") || text.includes("acute")) {
-        urgency = "Urgent";
-      }
+        async function fetchHospitals() {
+            try {
+                // Fetch the central database structure generated by your pipeline workers
+                const response = await fetch('./hospitals.json');
+                if (!response.ok) throw new Error("Database interface unreachable.");
+                hospitalDataset = await response.json();
+                applyFilters();
+            } catch (error) {
+                console.error("Critical extraction drop:", error);
+                document.getElementById("hospitalGrid").innerHTML = `
+                    <div class="col-span-full py-12 text-center">
+                        <p class="text-rose-500 font-semibold text-sm">Failed to map institutional directory pipelines automatically.</p>
+                        <p class="text-xs text-slate-400 mt-1">Verify that your pipeline worker tasks have run successfully inside the control board.</p>
+                    </div>`;
+            }
+        }
 
-      setTriageResult({
-        urgency,
-        recs: scoreCard.slice(0,3).map(item => item.hosp)
-      });
-      setTriageLoading(false);
-    }, 1200);
-  };
+        function setTagFilter(tag) {
+            activeTagFilter = tag;
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.className = "tag-btn bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-medium transition-all";
+            });
+            event.target.className = "tag-btn bg-teal-700 text-white px-3 py-1 rounded-full text-xs font-medium transition-all";
+            applyFilters();
+        }
 
-  if (loading) {
-    return E("div", {style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0a1628",color:"#8ea8d0"}},
-      E("div", {style:{fontSize:28,color:"#c8a951",fontWeight:900,fontFamily:"'Playfair Display',serif",marginBottom:12}}, "MediGuide Ethiopia"),
-      E("div", null, 
-        E("span", {className:"dot1", style:{fontSize:20}}, "● "),
-        E("span", {className:"dot2", style:{fontSize:20}}, "● "),
-        E("span", {className:"dot3", style:{fontSize:20}}, "● ")
-      ),
-      E("p", {style:{marginTop:14,fontSize:11,letterSpacing:"0.05em",textTransform:"uppercase"}}, "Streaming Verified Healthcare Matrix...")
-    );
-  }
+        function applyFilters() {
+            const query = document.getElementById("searchInput").value.toLowerCase().strip();
+            const sector = document.getElementById("typeFilter").value;
 
-  if (error) {
-    return E("div", {style:{padding:40, textAlign:"center", background:"#0a1628", minHeight:"100vh"}},
-      E("h2", {style:{color:"#ff4444"}}, "Sync Error"),
-      E("p", {style:{color:"#8ea8d0", marginTop:10}}, error)
-    );
-  }
+            const filtered = hospitalDataset.filter(h => {
+                const matchesSearch = 
+                    h.name.toLowerCase().includes(query) || 
+                    (h.am && h.am.includes(query)) ||
+                    h.desc.toLowerCase().includes(query) ||
+                    h.tags.some(t => t.toLowerCase().includes(query));
+                
+                const matchesSector = (sector === "All" || h.type === sector);
+                const matchesTag = (activeTagFilter === "All" || h.tags.some(t => t.toLowerCase() === activeTagFilter.toLowerCase()));
 
-  // Frontend Filter Matrix
-  const filtered = hospitals.filter(h => {
-    const matchSearch = h.name.toLowerCase().includes(search.toLowerCase()) || 
-                        h.am.includes(search) ||
-                        h.tags.some(t => t.toLowerCase().includes(search.toLowerCase()));
-    const matchType = filterType === "All" || h.type === filterType;
-    return matchSearch && matchType;
-  });
+                return matchesSearch && matchesSector && matchesTag;
+            });
 
-  return E("div", {style:{minHeight:"100vh",display:"flex",flexDirection:"column"}},
-    // Header View
-    E("header", {style:{background:"#0f2040",borderBottom:"1px solid #1e3a6e",padding:"16px 22px",position:"sticky",top:0,zIndex:100}},
-      E("div", {style:{maxWidth:1100,margin:\"0 auto\",display:\"flex\",justifyContent:\"between\",alignItems:\"center\",flexWrap:\"wrap\",gap:12}},
-        E("div", {onClick:()=>setTab("directory"),style:{cursor:\"pointer\"}},
-          E("h1", {style:{fontSize:20,fontWeight:900,color:\"#c8a951\",fontFamily:\"'Playfair Display',serif\"}},"MediGuide Ethiopia"),
-          E("div", {style:{fontSize:10,color:\"#8ea8d0\",letterSpacing:1}},\"ADDIS ABABA SPECIALIZED DIRECTORY\")
-        ),
-        E("nav", {style:{display:\"flex\",gap:8}},
-          E("button",{className:`nav-btn ${tab==="directory"?"active":""}`,onClick:()=>setTab("directory")},"🏥 Medical Directory"),
-          E("button",{className:`nav-btn ${tab==="triage"?"active":""}`,onClick:()=>setTab("triage")},"⚕ AI Symptom Triage"),
-          E("button",{className:`nav-btn ${tab==="disclaimer"?"active":""}`,onClick:()=>setTab("disclaimer")},"📋 Rules")
-        )
-      )
-    ),
+            renderGrid(filtered);
+        }
 
-    // Main Interactive Views
-    E("main", {style:{flex:1,maxWidth:1100,width:\"100%\",margin:\"0 auto\",padding:\"22px\"}},
-      tab === "directory" ? E("div", {className:\"fade\"},
-        E("div", {style:{display:\"grid\",gridTemplateColumns:\"1fr\",gap:22},className:\"grid-md-2\"},
-          // Left Panel Column
-          E("div", null,
-            E("input", {className:\"search-inp\",placeholder:\"🔍 Search subspecialties, doctors, keywords (e.g. burns, oncology)...\",value:search,onChange:(e)=>setSearch(e.target.value)}),
-            E("div", {style:{display:\"flex\",gap:6,marginBottom:16,flexWrap:\"wrap\"}},
-              [\"All\",\"Public\",\"Private\",\"NGO\"].map(t => 
-                E(\"button\", {key:t,className:`filter-btn ${filterType===t?\"active\":\"\"}`,onClick:()=>setFilterType(t)}, t === \"All\" ? \"🌍 Show All Centers\" : `${t} Centers`)
-              )
-            ),
-            E(\"div\", {style:{maxHeight:\"calc(100vh - 240px)\",overflowY:\"auto\",paddingRight:4}},
-              filtered.length === 0 ? E(\"p\",{style:{color:\"#8ea8d0\",fontStyle:\"italic\"}},\"No matching healthcare facilities found.\") :
-              filtered.map(h => E(\"div\", {key:h.id,className:`hosp-card ${selectedHosp?.id===h.id?\"open\":\"\"}`,onClick:()=>setSelectedHosp(h)},
-                E(\"div\", {style:{display:\"flex\",justifyContent:\"between\",alignItems:\"flex-start\",gap:8}},
-                  E(\"h3\", {style:{fontSize:15,fontWeight:700,color:\"#e8f0ff\"}}, h.name),
-                  E(\"span\", {className: h.type===\"Public\"?\"badge-pub\":h.type===\"Private\"?\"badge-priv\":\"badge-ngo\"}, h.type)
-                ),
-                E(\"div\", {style:{fontSize:12,color:\"#c8a951\",marginTop:2,fontWeight:500}}, h.am),
-                E(\"p\", {style:{fontSize:12,color:\"#8ea8d0\",marginTop:6,lineHeight:1.4}}, h.badge),
-                E(\"div\", {style:{marginTop:8}}, h.tags.slice(0,5).map((tg,idx)=>E(\"span\",{key:idx,className:\"spec-pill\"},tg)))
-              ))
-            )
-          ),
+        function renderGrid(data) {
+            const grid = document.getElementById("hospitalGrid");
+            document.getElementById("resultCount").innerText = data.length;
 
-          // Right Panel Details Column
-          E(\"div\", null,
-            selectedHosp ? E(\"div\", {className:\"fade\",style:{background:\"#0f2040\",border:\"1px solid #c8a951\",borderRadius:12,padding:22,position:\"sticky\",top:85}},
-              E(\"div\", {style:{borderBottom:\"1px solid #1e3a6e\",paddingBottom:12,marginBottom:14}},
-                E(\"span\", {className:\"badge-gold\"}, `Est. ${selectedHosp.est || \"-\"} · ${selectedHosp.beds || \"-\"} Beds`),
-                E(\"h2\", {style:{fontSize:18,fontWeight:900,color:\"#c8a951\",marginTop:6,fontFamily:\"'Playfair Display',serif\"}}, selectedHosp.name),
-                E(\"p\", {style:{color:\"#8ea8d0\",fontSize:12}}, selectedHosp.desc)
-              ),
-              E(\"div\", {style:{display:\"grid\",gridTemplateColumns:\"1fr 1fr\",gap:10,marginBottom:16}},
-                E(\"div\",{className:\"loc-card\"},E(\"span\",null,\"📍\"),E(\"div\",null,E(\"b\",{style:{fontSize:11,color:\"#c8a951\"}},\"LOCATION\"),E(\"p\",{style:{fontSize:11,color:\"#8ea8d0\"}},selectedHosp.addr))),
-                E(\"div\",{className:\"loc-card\"},E(\"span\",null,\"📅\"),E(\"div\",null,E(\"b\",{style:{fontSize:11,color:\"#c8a951\"}},\"APPOINTMENT ENTRY\"),E(\"p\",{style:{fontSize:11,color:\"#8ea8d0\"}},selectedHosp.appt)))
-              ),
-              E(\"h4\", {style:{fontSize:12,fontWeight:800,color:\"#e8f0ff\",letterSpacing:1,marginBottom:10}},\"VERIFIED MEDICAL DEPARTMENTS & STAFF\"),
-              E(\"div\", {style:{maxHeight:320,overflowY:\"auto\",display:\"flex\",flexDirection:\"column\",gap:8}},
-                selectedHosp.specs.map((sp,i)=>E(\"div\",{key:i,className:\"sub-card\"},
-                  E(\"div\",{style:{fontWeight:700,color:\"#c8a951\",fontSize:13,display:\"flex\",gap:6}},E(\"span\",null,sp.icon),E(\"span\",null,sp.n)),
-                  E(\"div\",{style:{marginTop:6}},sp.subs.map((su,j)=>E(\"span\",{key:j,style:{display:\"inline-block\",background:\"#070f1e\",fontSize:10,padding:\"2px 6px\",borderRadius:4,margin:\"2px 4px 2px 0\",color:\"#8ea8d0\"}},su))),
-                  sp.docs && sp.docs.length > 0 && E(\"div\",{style:{borderTop:\"1px dashed #1e3a6e\",marginTop:8,paddingTop:6}},
-                    E(\"span\",{style:{fontSize:10,color:\"#8ea8d0\",fontWeight:700,display:\"block\",marginBottom:2}},\"ASSIGNED CONSULTANTS:\"),
-                    sp.docs.map((doc,k)=>E(\"div\",{key:k,style:{fontSize:11,color:\"#e8f0ff\"}},\"👨‍⚕️ \"+doc))
-                  )
-                ))
-              ),
-              selectedHosp.phone && E(\"a\",{href:`tel:${selectedHosp.phone}`,style:{display:\"block\",background:\"#c8a951\",color:\"#0a0800\",textAlign:\"center\",padding:10,borderRadius:8,fontWeight:800,marginTop:14,textDecoration:\"none\"}},\"📞 Call Center: \"+selectedHosp.phone)
-            ) : E(\"div\",{style:{border:\"1px dashed #1e3a6e\",borderRadius:12,padding:40,textAlign:\"center\",color:\"#8ea8d0\",marginTop:40}},\"Select a healthcare facility from the listing to view its verified clinicians and clinical departments.\")
-          )
-        )
-      ) : tab === \"triage\" ? E(\"div\", {className:\"fade\",style:{maxWidth:650,margin:\"0 auto\"}},
-        E(\"h2\",{style:{fontFamily:\"'Playfair Display',serif\",color:\"#c8a951\",fontSize:22,marginBottom:6}},\"AI Symptom Guidance Module\"),
-        E(\"p\",{style:{color:\"#8ea8d0\",fontSize:12,marginBottom:18}},\"Describe your medical conditions naturally. Our sorting logic evaluates entries against subspecialty profiles in Addis Ababa to recommend matching institutions.\"),
-        E(\"form\",{onSubmit:handleTriage},
-          E(\"textarea\",{className:\"sym-area\",value:symptoms,onChange:(e)=>setSymptoms(e.target.value),placeholder:\"Describe symptoms clearly. E.g., 'Child with high fever and shortness of breath' or 'Chronic chest discomfort moving to the left arm'...\"}),
-          E(\"div\",{style:{marginTop:10,textAlign:\"right\"}},
-            E(\"button\",{type:\"submit\",className:`submit-btn ${symptoms.trim()?\"on\":\"off\"}`,disabled:!symptoms.trim() || triageLoading}, triageLoading ? \"Analyzing Signatures...\" : \"Match Suitable Medical Facilities\")
-          )
-        ),
-        triageResult && E(\"div\",{className:\"fade\",style:{marginTop:22,borderTop:\"1px solid #1e3a6e\",paddingTop:20}},
-          E(\"div\",{className: triageResult.urgency===\"Emergency\"?\"urg-emergency\":triageResult.urgency===\"Urgent\"?\"urg-urgent\":\"urg-routine\"},
-            triageResult.urgency === \"Emergency\" ? \"🚨 IMMEDIATE EMERGENCY RESPONSE REQUIRED: Proceed directly to closest trauma facility.\" :
-            triageResult.urgency === \"Urgent\" ? \"⚠️ URGENT CLINICAL EVALUATION RECOMENDED: Schedule a consultation soon.\" : \"🟢 ROUTINE VISIT: Regular schedule acceptable.\"
-          ),
-          E(\"h3\",{style:{fontSize:13,color:\"#c8a951\",marginBottom:10,fontWeight:800}},\"MATCHED SPECIALIZED TREATMENT FACILITIES:\"),
-          triageResult.recs.length === 0 ? E(\"p\",{style:{color:\"#8ea8d0\",fontSize:12}},\"No specific match found. Please reference standard public general hospitals.\") :
-          triageResult.recs.map((r,idx)=>E(\"div\",{key:r.id,className:\"rec-card\"},
-            E(\"div\",{className:\"num-circle\",style:{background:\"#c8a951\",color:\"#0a0800\"}},idx+1),
-            E(\"div\",null,
-              E(\"h4\",{style:{color:\"#e8f0ff\",fontSize:14,fontWeight:700}},r.name),
-              E(\"p\",{style:{color:\"#8ea8d0\",fontSize:11,marginTop:2}},r.badge),
-              E(\"button\",{className:\"ex-btn\",style:{marginTop:6},onClick:()=>{setSelectedHosp(r); setTab(\"directory\");}},\"View Clinic Details →\")
-            )
-          ))
-        )
-      ) : E(\"div\", {className:\"fade\",style:{maxWidth:700,margin:\"0 auto\"}},
-        E(\"h2\",{style:{fontFamily:\"'Playfair Display',serif\",color:\"#c8a951\",fontSize:22,marginBottom:14}},\"MediGuide Legal Framework & Rules\"),
-        E(\"div\",{className:\"disc-section\"},
-          E(\"h3\",{className:\"disc-title\"},\"1. Informational Scope Only\"),
-          E(\"p\",{className:\"disc-body\"},\"All structural listings, phone profiles, and rosters mapped onto this application are maintained via autonomic web research. Data changes dynamically. Users must directly confirm availability prior to emergency travel.\")
-        ),
-        E(\"div\",{className:\"disc-section\"},
-          E(\"h3\",{className:\"disc-title\"},\"2. No Medical Advice\"),
-          E(\"p\",{className:\"disc-body\"},\"The symptom tracker operates via keyword correlation algorithms designed to align medical problems to specialist rosters. It does not replace physical examinations by qualified doctors.\")
-        )
-      )
-    ),
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400 text-sm">
+                        No facilities match your search criteria. Try filtering by broad specializations.
+                    </div>`;
+                return;
+            }
 
-    // Footer
-    E(\"footer\", {style:{background:\"#050e20\",borderTop:\"1px solid #1e3a6e\",padding:\"22px\"}},
-      E(\"div\", {style:{maxWidth:1100,margin:\"0 auto\",textAlign:\"center\"}},
-        E(\"div\", {style:{fontSize:15,fontWeight:900,fontFamily:\"'Playfair Display',serif\",color:\"#c8a951\",marginBottom:6}},\"MediGuide Ethiopia\"),
-        E(\"p\", {style:{fontSize:11,color:\"#8ea8d0\",maxWidth:600,margin:\"0 auto 12px\",lineHeight:1.75}},\"Comprehensive medical directory mapping specialized hospitals and consultants in Addis Ababa, Ethiopia. Data synced via autonomic background agents.\")
-      )
-    )
-  );
-}
+            grid.innerHTML = data.map(h => `
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 transition-all duration-200 flex flex-col p-5">
+                    <div class="flex justify-between items-start gap-2 mb-3">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-sm ${h.type === 'Public' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'}">${h.type}</span>
+                        ${h.badge ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[10px] font-semibold px-2 py-0.5 rounded-full">${h.badge}</span>` : ''}
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-base leading-snug line-clamp-1">${h.name}</h3>
+                    <p class="text-xs text-slate-400 font-medium mb-2">${h.am || ''}</p>
+                    <p class="text-xs text-slate-500 line-clamp-2 mb-4 flex-1">${h.desc}</p>
+                    <div class="flex items-center gap-1 mb-4 flex-wrap">
+                        ${h.tags.slice(0, 3).map(t => `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-sm text-[10px] font-medium font-mono">#${t}</span>`).join('')}
+                    </div>
+                    <button onclick="openModal(${h.id})" class="w-full bg-slate-900 text-white hover:bg-teal-700 text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors cursor-pointer text-center">
+                        Review Clinicians & Access Details
+                    </button>
+                </div>
+            `).join('');
+        }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(E(App));
-</script>
+        function openModal(id) {
+            const h = hospitalDataset.find(item => item.id === id);
+            if (!h) return;
+
+            document.getElementById("modalType").innerText = h.type;
+            document.getElementById("modalName").innerText = h.name;
+            document.getElementById("modalAmharic").innerText = h.am || '';
+            document.getElementById("modalDesc").innerText = h.desc;
+            document.getElementById("modalAddr").innerText = h.addr;
+            
+            const phoneEl = document.getElementById("modalPhoneLink");
+            phoneEl.innerText = h.phone;
+            phoneEl.href = `tel:${h.phone}`;
+            
+            document.getElementById("modalAppt").innerText = h.appt;
+            
+            const webEl = document.getElementById("modalWeb");
+            webEl.innerText = h.web;
+            webEl.href = h.web;
+
+            // Render out nested specialized clinical doctor paths efficiently
+            const specsContainer = document.getElementById("modalSpecs");
+            if (!h.specs || h.specs.length === 0) {
+                specsContainer.innerHTML = `<p class="text-xs text-slate-400 italic">No specialist directories are currently indexed for this node.</p>`;
+            } else {
+                specsContainer.innerHTML = h.specs.map(s => `
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <h5 class="text-xs font-bold text-teal-800 mb-2 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-teal-500 rounded-full"></span> ${s.dep}
+                        </h5>
+                        <ul class="space-y-2 pl-2.5">
+                            ${s.docs.map(d => `
+                                <li class="text-xs border-l-2 border-slate-200 pl-2">
+                                    <span class="font-semibold text-slate-800 block text-[13px]">${d.name}</span>
+                                    <span class="text-slate-500 font-medium block text-[11px]">${d.sub} — <span class="italic text-slate-400">${d.edu}</span></span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById("detailsModal").classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+            document.getElementById("detailsModal").classList.add("hidden");
+            document.body.style.overflow = "auto";
+        }
+    </script>
 </body>
 </html>
