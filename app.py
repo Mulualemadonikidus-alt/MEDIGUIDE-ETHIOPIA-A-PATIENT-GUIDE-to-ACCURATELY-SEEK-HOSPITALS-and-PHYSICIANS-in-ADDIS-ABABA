@@ -35,7 +35,7 @@ db = load_db()
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("Total Active Centers", len(db))
 
-# Defensive calculations to prevent malformed data strings from crashing the app
+# Safe metric calculations using explicit validation loops to avoid unexpected formatting type errors
 public_count = sum(1 for h in db if isinstance(h, dict) and h.get('type') == 'Public')
 private_count = sum(1 for h in db if isinstance(h, dict) and h.get('type') == 'Private')
 
@@ -45,18 +45,13 @@ for h in db:
         specs = h.get('specs', [])
         if isinstance(specs, list):
             for s in specs:
-                # Strictly verify that 's' is a dictionary object before calling .get()
                 if isinstance(s, dict):
-                    docs = s.get('docs', [])
-                    if isinstance(docs, list):
-                        total_specialists += len(docs)
-                elif isinstance(s, str):
-                    # Data anomaly handling: If it's a plain string, it doesn't contain a nested docs list
-                    pass
+                    total_specialists += len(s.get('docs', []))
 
 m2.metric("Public Institutions", public_count)
 m3.metric("Private Centers", private_count)
 m4.metric("Tracked Specialists", total_specialists)
+
 tab_edit, tab_sync = st.tabs(["✏️ Edit Live Directories", "🔄 Run Pipeline Worker Manual Overrides"])
 
 with tab_edit:
@@ -140,9 +135,19 @@ target_html = next((f for f in html_options if os.path.exists(os.path.join(BASE_
 if target_html:
     with open(os.path.join(BASE_DIR, target_html), "r", encoding="utf-8") as f:
         html_content = f.read()
+        
+        # Parse memory tracking array structure into standard serialized layout configuration format
+        db_json_string = json.dumps(db, ensure_ascii=False)
+        
+        # Inject current dataset entries straight into the variable placeholder to bypass iframe cross-origin blocks
+        injected_html = html_content.replace(
+            "let hospitalDataset = [];",
+            f"let hospitalDataset = {db_json_string};"
+        )
+        
         # Escape HTML structure parameters safely to inject inside srcdoc
-        escaped_html = html.escape(html_content)
-        iframe_style_wrapper = f'<iframe srcdoc="{escaped_html}" width="100%" height="650" style="border:none; background:white; border-radius:8px;"></iframe>'
+        escaped_html = html.escape(injected_html)
+        iframe_style_wrapper = f'<iframe srcdoc="{escaped_html}" width="100%" height="800" style="border:none; background:white; border-radius:8px;"></iframe>'
         st.html(iframe_style_wrapper)
 else:
     st.info("Upload your index.html file to review frontend canvas rendering benchmarks.")
