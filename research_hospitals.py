@@ -1,129 +1,83 @@
 import os
 import json
 import requests
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 
-# 1. Define the correct, unified database path
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'hospitals.json')
+# Grab environment variables passed down safely from app.py
+SERPER_KEY = os.environ.get("SERPER_API_KEY")
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 
-def load_database():
-    if not os.path.exists(DB_PATH):
-        return []
-    try:
-        with open(DB_PATH, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return data if isinstance(data, list) else []
-    except Exception:
-        return []
+DB_PATH = "hospitals.json"
 
-def save_database(data):
-    with open(DB_PATH, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-def run_weekly_hospital_search():
-    print("Initiating autonomic weekly search for newly identified Addis Ababa clinics...")
-    db = load_database()
-    existing_names = {h['name'].lower() for h in db if 'name' in h}
-    
-    # query local clinical search indices using public Serper/Google engine API keys
-    api_key = os.environ.get("SERPER_API_KEY")
-    if not api_key:
-        print("Missing API key configuration.")
+def run_research():
+    if not SERPER_KEY or not GEMINI_KEY:
+        print("Missing required API orchestration configuration variables.")
         return
-        
-    url = "https://google.serper.dev/search"
-    payload = json.dumps({
-      "q": "newly opened specialty clinic hospital medical center Addis Ababa, Ethiopia",
-      "gl": "et",
-      "num": 10
-    })
-    headers = {
-      'X-API-KEY': api_key,
-      'Content-Type': 'application/json'
-    }
+    
+    print("Initiating web discovery sweeps for Addis Ababa healthcare nodes...")
+    
+    # 1. Query the Serper Google Search Engine Layer
+    headers = {"X-API-KEY": SERPER_KEY, "Content-Type": "application/json"}
+    payload = json.dumps({"q": "specialized hospitals medical centers in Addis Ababa Ethiopia address phone"})
     
     try:
-        response = requests.post(url, headers=headers, data=payload).json()
-        search_results = response.get('organic', [])
+        response = requests.post("https://google.serper.dev/search", headers=headers, data=payload)
+        search_results = response.json()
     except Exception as e:
-        print(f"Network discovery error: {e}")
+        print(f"Network processing bottleneck occurred: {e}")
         return
 
-    # Initialize Gemini API Client
-    ai_key = os.environ.get("GEMINI_API_KEY")
-    ai_client = genai.Client(api_key=ai_key) if ai_key else None
+    # 2. Package raw intelligence data for processing
+    raw_data_dump = str(search_results.get("organic", []))[:4000] 
 
-    new_discoveries = 0
-
-    for item in search_results:
-        title = item.get('title')
-        snippet = item.get('snippet', '')
-        link = item.get('link', '')
+    # 3. Configure Gemini context engines
+    genai.configure(api_key=GEMINI_KEY)
+    model = genai.GenerativeModel('gemini-pro')
+    
+    prompt = f"""
+    You are an expert medical database cleaner. Analyze this raw text data concerning healthcare centers in Addis Ababa:
+    {raw_data_dump}
+    
+    Convert this information into a valid, minified JSON array of objects representing unique hospitals. 
+    Each object MUST strict match this exact structural schema dictionary layout format:
+    {{
+      "id": 1,
+      "name": "Official English Hospital Name",
+      "am": "Amharic Translation if known or empty string",
+      "type": "Public" or "Private",
+      "est": 2000,
+      "beds": 100,
+      "addr": "Sub-City location details",
+      "phone": "Telephone hotline string",
+      "appt": "Walk-in",
+      "web": "URL string",
+      "badge": "Verified Info",
+      "desc": "Short overview text summary descriptive analysis",
+      "tags": ["general", "emergency"],
+      "specs": []
+    }}
+    Return ONLY the clean raw valid minified JSON array. Do not append markdown wrapper blocks or code tags.
+    """
+    
+    try:
+        ai_response = model.generate_content(prompt)
+        cleaned_text = ai_response.text.strip()
         
-        # Determine if this search entry mentions a hospital not in our database
-        is_novel = True
-        for name in existing_names:
-            if name in title.lower() or title.lower() in name:
-                is_novel = False
-                break
-                
-        if is_novel and ai_client:
-            print(f"Analyzing unmapped medical node candidate: {title}")
-            
-            # Format unstructured snippets cleanly using structured data generations
-            prompt = f"""
-            Extract the entity info into our precise JSON structure.
-            Candidate Title: {title}
-            Context Snippet: {snippet}
-            Target Link: {link}
-            
-            Return raw valid JSON following this format:
-            {{
-              "name": "Full English Name",
-              "am": "Amharic Name if inferable, else leave empty string",
-              "type": "Public" or "Private" or "NGO",
-              "est": year integer or null,
-              "beds": integer or null,
-              "addr": "Approximate sub-city or street name in Addis Ababa",
-              "phone": "Inferred contact number or empty string",
-              "appt": "Walk-in OPD or contact center",
-              "web": "{link}",
-              "fb": "",
-              "tg": "",
-              "coords": "Approximate coordinates string based on location",
-              "badge": "Short highlights tagline less than 8 words",
-              "desc": "A concise informative single paragraph about what they treat.",
-              "tags": ["lowercase","keywords","matching","specialties"],
-              "specs": []
-            }}
-            """
-            try:
-                ai_response = ai_client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json"
-                    )
-                )
-                structured_data = json.loads(ai_response.text)
-                
-                # Assign a unique tracking token ID safely
-                max_id = max([h.get("id", 0) for h in db]) if db else 0
-                structured_data["id"] = max_id + 1
-                
-                db.append(structured_data)
-                existing_names.add(structured_data["name"].lower())
-                new_discoveries += 1
-            except Exception as ex:
-                print(f"Structured AI parsing exception: {ex}")
-                
-    if new_discoveries > 0:
-        save_database(db)
-        print(f"Autonomic framework successfully appended {new_discoveries} new centers. Database updated successfully.")
-    else:
-        print("No unmapped clinical footprints discovered this week. Database remains unchanged.")
+        # Strip potential markdown wrappers securely
+        if cleaned_text.startswith("```json"):
+            cleaned_text = cleaned_text[7:]
+        if cleaned_text.endswith("```"):
+            cleaned_text = cleaned_text[:-3]
+        
+        parsed_json = json.loads(cleaned_text.strip())
+        
+        # Commit freshly discovered updates straight to the database layer
+        with open(DB_PATH, "w", encoding="utf-8") as f:
+            json.dump(parsed_json, f, indent=2, ensure_ascii=False)
+        print("Live database successfully populated with fresh discovery arrays.")
+        
+    except Exception as e:
+        print(f"Parsing engine exception run handled: {e}")
 
 if __name__ == "__main__":
-    run_weekly_hospital_search()
+    run_research()
