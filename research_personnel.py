@@ -1,7 +1,8 @@
 import os
 import json
 import requests
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,8 +27,11 @@ def audit_personnel():
         print("Error: Missing secure execution environment credentials.", file=sys.stderr)
         sys.exit(1)
 
-    genai.configure(api_key=GEMINI_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    try:
+        client = genai.Client(api_key=GEMINI_KEY)
+    except Exception as e:
+        print(f"Failed to initialize Gemini Client: {e}", file=sys.stderr)
+        sys.exit(1)
 
     for h in hospitals:
         headers = {"X-API-KEY": SERPER_KEY, "Content-Type": "application/json"}
@@ -57,7 +61,13 @@ def audit_personnel():
             ]
             """
             
-            ai_res = model.generate_content(prompt, generation_config={"response_mime_type": "application/json"})
+            ai_res = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
+            )
             h["specs"] = json.loads(ai_res.text.strip())
             
         except Exception as e:
